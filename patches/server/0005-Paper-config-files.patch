@@ -14,7 +14,7 @@ public org.spigotmc.SpigotWorldConfig getString(Ljava/lang/String;Ljava/lang/Str
 public net.minecraft.world.level.NaturalSpawner SPAWNING_CATEGORIES
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 15456e54d8a392e702a30dfb3d06a3f74156dce7..4294f230f91f03db2181d355d3be84bf032eeffb 100644
+index 0d04c3af92f7d4e63b1178247e493174cedd9178..1c183e9083a5ce2a2995ae45864c564b7cde3f53 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -13,6 +13,7 @@ dependencies {
@@ -23,8 +23,8 @@ index 15456e54d8a392e702a30dfb3d06a3f74156dce7..4294f230f91f03db2181d355d3be84bf
      testImplementation("org.mockito:mockito-core:4.9.0") // Paper - switch to mockito
 +    implementation("org.spongepowered:configurate-yaml:4.1.2") // Paper - config files
      implementation("commons-lang:commons-lang:2.6")
-     runtimeOnly("org.xerial:sqlite-jdbc:3.36.0.3")
-     runtimeOnly("mysql:mysql-connector-java:8.0.29")
+     runtimeOnly("org.xerial:sqlite-jdbc:3.41.0.0")
+     runtimeOnly("com.mysql:mysql-connector-j:8.0.32")
 diff --git a/src/main/java/com/destroystokyo/paper/PaperConfig.java b/src/main/java/com/destroystokyo/paper/PaperConfig.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..ef41cf3a7d1e6f2bfe81e0fb865d2f969bbc77c1
@@ -123,7 +123,7 @@ index 0000000000000000000000000000000000000000..7a4a7a654fe2516ed894a68f2657344d
 +}
 diff --git a/src/main/java/io/papermc/paper/configuration/Configurations.java b/src/main/java/io/papermc/paper/configuration/Configurations.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..c2dca89291361d60cbf160cab77749cb0130035a
+index 0000000000000000000000000000000000000000..9ef6712c70fcd8912a79f3f61e351aac09572cf3
 --- /dev/null
 +++ b/src/main/java/io/papermc/paper/configuration/Configurations.java
 @@ -0,0 +1,311 @@
@@ -160,7 +160,7 @@ index 0000000000000000000000000000000000000000..c2dca89291361d60cbf160cab77749cb
 +
 +public abstract class Configurations<G, W> {
 +
-+    private static final Logger LOGGER = LogUtils.getLogger();
++    private static final Logger LOGGER = LogUtils.getClassLogger();
 +    public static final String WORLD_DEFAULTS = "__world_defaults__";
 +    public static final ResourceLocation WORLD_DEFAULTS_KEY = new ResourceLocation("configurations", WORLD_DEFAULTS);
 +    protected final Path globalFolder;
@@ -934,7 +934,7 @@ index 0000000000000000000000000000000000000000..69add4a7f1147015806bc9b63a8340d1
 +}
 diff --git a/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java b/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..9fde9ccb5d069ddce8dd837ef1bc68b93ce66434
+index 0000000000000000000000000000000000000000..f6b9d216c24d8858802f85209fe1a869e5a9be31
 --- /dev/null
 +++ b/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java
 @@ -0,0 +1,439 @@
@@ -1011,7 +1011,7 @@ index 0000000000000000000000000000000000000000..9fde9ccb5d069ddce8dd837ef1bc68b9
 +@SuppressWarnings("Convert2Diamond")
 +public class PaperConfigurations extends Configurations<GlobalConfiguration, WorldConfiguration> {
 +
-+    private static final Logger LOGGER = LogUtils.getLogger();
++    private static final Logger LOGGER = LogUtils.getClassLogger();
 +    static final String GLOBAL_CONFIG_FILE_NAME = "paper-global.yml";
 +    static final String WORLD_DEFAULTS_CONFIG_FILE_NAME = "paper-world-defaults.yml";
 +    static final String WORLD_CONFIG_FILE_NAME = "paper-world.yml";
@@ -1448,7 +1448,7 @@ index 0000000000000000000000000000000000000000..1bb16fc7598cd53e822d84b69d6a9727
 +}
 diff --git a/src/main/java/io/papermc/paper/configuration/WorldConfiguration.java b/src/main/java/io/papermc/paper/configuration/WorldConfiguration.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..4532f3a0d74feae0a1249b53e1bfbc18a8808b32
+index 0000000000000000000000000000000000000000..51cf0014c4229fc8671804d885b6381996810130
 --- /dev/null
 +++ b/src/main/java/io/papermc/paper/configuration/WorldConfiguration.java
 @@ -0,0 +1,475 @@
@@ -1502,7 +1502,7 @@ index 0000000000000000000000000000000000000000..4532f3a0d74feae0a1249b53e1bfbc18
 +
 +@SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal", "NotNullFieldNotInitialized", "InnerClassMayBeStatic"})
 +public class WorldConfiguration extends ConfigurationPart {
-+    private static final Logger LOGGER = LogUtils.getLogger();
++    private static final Logger LOGGER = LogUtils.getClassLogger();
 +    static final int CURRENT_VERSION = 30; // (when you change the version, change the comment, so it conflicts on rebases): rename filter bad nbt from spawn eggs
 +
 +    private transient final SpigotWorldConfig spigotConfig;
@@ -1965,7 +1965,7 @@ index 0000000000000000000000000000000000000000..514be9a11e2ca368ea72dd2bac1b84bf
 +}
 diff --git a/src/main/java/io/papermc/paper/configuration/constraint/Constraints.java b/src/main/java/io/papermc/paper/configuration/constraint/Constraints.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..b470332f542c30c42355adb711ff148e8e1dd7a1
+index 0000000000000000000000000000000000000000..6bcc08698be6eb1bf5607991d52f6dcf05db665c
 --- /dev/null
 +++ b/src/main/java/io/papermc/paper/configuration/constraint/Constraints.java
 @@ -0,0 +1,74 @@
@@ -1993,7 +1993,7 @@ index 0000000000000000000000000000000000000000..b470332f542c30c42355adb711ff148e
 +
 +    public static final class Velocity implements Constraint<GlobalConfiguration.Proxies.Velocity> {
 +
-+        private static final Logger LOGGER = LogUtils.getLogger();
++        private static final Logger LOGGER = LogUtils.getClassLogger();
 +
 +        @Override
 +        public void validate(final GlobalConfiguration.Proxies.@Nullable Velocity value) throws SerializationException {
@@ -2253,7 +2253,7 @@ index 0000000000000000000000000000000000000000..27c0679d376bb31ab52131dfea74b3b5
 +}
 diff --git a/src/main/java/io/papermc/paper/configuration/serializer/EnumValueSerializer.java b/src/main/java/io/papermc/paper/configuration/serializer/EnumValueSerializer.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..2afb9268447792e3cdb46172b2050dbce066c59a
+index 0000000000000000000000000000000000000000..8535c748a5e355362e77e6c5103e11c4c318a138
 --- /dev/null
 +++ b/src/main/java/io/papermc/paper/configuration/serializer/EnumValueSerializer.java
 @@ -0,0 +1,50 @@
@@ -2279,7 +2279,7 @@ index 0000000000000000000000000000000000000000..2afb9268447792e3cdb46172b2050dbc
 + */
 +public class EnumValueSerializer extends ScalarSerializer<Enum<?>> {
 +
-+    private static final Logger LOGGER = LogUtils.getLogger();
++    private static final Logger LOGGER = LogUtils.getClassLogger();
 +
 +    public EnumValueSerializer() {
 +        super(new TypeToken<Enum<?>>() {});
@@ -2367,7 +2367,7 @@ index 0000000000000000000000000000000000000000..b44b2dc28f619594e302417848e95c00
 +}
 diff --git a/src/main/java/io/papermc/paper/configuration/serializer/PacketClassSerializer.java b/src/main/java/io/papermc/paper/configuration/serializer/PacketClassSerializer.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..bc065d5cc8975dd189954272116a6bc5bc7f4e28
+index 0000000000000000000000000000000000000000..893ad5e7c2d32ccd64962d95d146bbd317c28ab8
 --- /dev/null
 +++ b/src/main/java/io/papermc/paper/configuration/serializer/PacketClassSerializer.java
 @@ -0,0 +1,86 @@
@@ -2393,7 +2393,7 @@ index 0000000000000000000000000000000000000000..bc065d5cc8975dd189954272116a6bc5
 +@SuppressWarnings("Convert2Diamond")
 +public final class PacketClassSerializer extends ScalarSerializer<Class<? extends Packet<?>>> implements MapSerializer.WriteBack {
 +
-+    private static final Logger LOGGER = LogUtils.getLogger();
++    private static final Logger LOGGER = LogUtils.getClassLogger();
 +    private static final TypeToken<Class<? extends Packet<?>>> TYPE = new TypeToken<Class<? extends Packet<?>>>() {};
 +    private static final List<String> SUBPACKAGES = List.of("game", "handshake", "login", "status");
 +    private static final BiMap<String, String> MOJANG_TO_OBF;
@@ -2592,7 +2592,7 @@ index 0000000000000000000000000000000000000000..4af710e144b70933d750c22edfe484c1
 +}
 diff --git a/src/main/java/io/papermc/paper/configuration/serializer/collections/MapSerializer.java b/src/main/java/io/papermc/paper/configuration/serializer/collections/MapSerializer.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..f44d4cb05eab25d79a8ac09b9da981633380c4fc
+index 0000000000000000000000000000000000000000..9b5075c39a4ef931cdb99e9aee8a33c6d88c2a2e
 --- /dev/null
 +++ b/src/main/java/io/papermc/paper/configuration/serializer/collections/MapSerializer.java
 @@ -0,0 +1,162 @@
@@ -2626,7 +2626,7 @@ index 0000000000000000000000000000000000000000..f44d4cb05eab25d79a8ac09b9da98163
 +
 +    public static final TypeToken<Map<?, ?>> TYPE = new TypeToken<Map<?, ?>>() {};
 +
-+    private static final Logger LOGGER = LogUtils.getLogger();
++    private static final Logger LOGGER = LogUtils.getClassLogger();
 +
 +    private final boolean clearInvalids;
 +
@@ -3050,7 +3050,7 @@ index 0000000000000000000000000000000000000000..96e8d03bd4a4d43633a94bb251054610
 +}
 diff --git a/src/main/java/io/papermc/paper/configuration/transformation/global/LegacyPaperConfig.java b/src/main/java/io/papermc/paper/configuration/transformation/global/LegacyPaperConfig.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..d21335930652ffced22f6fd19ab1a4f9ad599db8
+index 0000000000000000000000000000000000000000..fec6d0b249c6dc7856c5acc4e7dad9fcfabfe35b
 --- /dev/null
 +++ b/src/main/java/io/papermc/paper/configuration/transformation/global/LegacyPaperConfig.java
 @@ -0,0 +1,222 @@
@@ -3076,7 +3076,7 @@ index 0000000000000000000000000000000000000000..d21335930652ffced22f6fd19ab1a4f9
 +import static org.spongepowered.configurate.NodePath.path;
 +
 +public final class LegacyPaperConfig {
-+    private static final Logger LOGGER = LogUtils.getLogger();
++    private static final Logger LOGGER = LogUtils.getClassLogger();
 +
 +    private LegacyPaperConfig() {
 +    }
@@ -3278,7 +3278,7 @@ index 0000000000000000000000000000000000000000..d21335930652ffced22f6fd19ab1a4f9
 +}
 diff --git a/src/main/java/io/papermc/paper/configuration/transformation/world/FeatureSeedsGeneration.java b/src/main/java/io/papermc/paper/configuration/transformation/world/FeatureSeedsGeneration.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..372dda1738da9ab94c963bb73cecdf52e031c903
+index 0000000000000000000000000000000000000000..1326aae8f95ab11f840abdee0c8c7a557705fd73
 --- /dev/null
 +++ b/src/main/java/io/papermc/paper/configuration/transformation/world/FeatureSeedsGeneration.java
 @@ -0,0 +1,71 @@
@@ -3309,13 +3309,13 @@ index 0000000000000000000000000000000000000000..372dda1738da9ab94c963bb73cecdf52
 +
 +import static org.spongepowered.configurate.NodePath.path;
 +
-+public class FeatureSeedsGeneration implements TransformAction {
++public final class FeatureSeedsGeneration implements TransformAction {
 +
 +    public static final String FEATURE_SEEDS_KEY = "feature-seeds";
 +    public static final String GENERATE_KEY = "generate-random-seeds-for-all";
 +    public static final String FEATURES_KEY = "features";
 +
-+    private static final Logger LOGGER = LogUtils.getLogger();
++    private static final Logger LOGGER = LogUtils.getClassLogger();
 +
 +    private final ResourceLocation worldKey;
 +
@@ -4045,7 +4045,7 @@ index 0000000000000000000000000000000000000000..7f8b685762f59049fde88e8d1bc10e15
 +}
 diff --git a/src/main/java/io/papermc/paper/configuration/type/IntOr.java b/src/main/java/io/papermc/paper/configuration/type/IntOr.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..a03e82fa80a548e18634ac2f536a995c3f518498
+index 0000000000000000000000000000000000000000..4dc1e4a5d92f70b2eda44cbbac2747932892970d
 --- /dev/null
 +++ b/src/main/java/io/papermc/paper/configuration/type/IntOr.java
 @@ -0,0 +1,89 @@
@@ -4064,7 +4064,7 @@ index 0000000000000000000000000000000000000000..a03e82fa80a548e18634ac2f536a995c
 +
 +public interface IntOr {
 +
-+    Logger LOGGER = LogUtils.getLogger();
++    Logger LOGGER = LogUtils.getClassLogger();
 +
 +    default int or(final int fallback) {
 +        return this.value().orElse(fallback);
@@ -4413,22 +4413,21 @@ index 0000000000000000000000000000000000000000..70cc7b45e7355f6c8476a74a070f1266
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index c1da75eb656d17bac41c1d5c7f57eac217c9996c..b7399e29094c66c88a6f4c0e996a906bcaa3b4ca 100644
+index 9b93b953f0747078d25289f129f82755089f94c9..aa054369cef3da4f90ce17788dcb9ca80dc98010 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
-@@ -117,6 +117,11 @@ public class Main {
-             DedicatedServerSettings dedicatedserversettings = new DedicatedServerSettings(optionset); // CraftBukkit - CLI argument support
- 
+@@ -131,6 +131,10 @@ public class Main {
              dedicatedserversettings.forceSave();
+             Path path2 = Paths.get("eula.txt");
+             Eula eula = new Eula(path2);
 +            // Paper start - load config files for access below if needed
 +            org.bukkit.configuration.file.YamlConfiguration bukkitConfiguration = io.papermc.paper.configuration.PaperConfigurations.loadLegacyConfigFile((File) optionset.valueOf("bukkit-settings"));
 +            org.bukkit.configuration.file.YamlConfiguration spigotConfiguration = io.papermc.paper.configuration.PaperConfigurations.loadLegacyConfigFile((File) optionset.valueOf("spigot-settings"));
 +            // Paper end
-+
-             Path path1 = Paths.get("eula.txt");
-             Eula eula = new Eula(path1);
  
-@@ -153,7 +158,7 @@ public class Main {
+             if (optionset.has("initSettings")) { // CraftBukkit
+                 // CraftBukkit start - SPIGOT-5761: Create bukkit.yml and commands.yml if not present
+@@ -165,7 +169,7 @@ public class Main {
              }
  
              File file = (File) optionset.valueOf("universe"); // CraftBukkit
@@ -4438,10 +4437,10 @@ index c1da75eb656d17bac41c1d5c7f57eac217c9996c..b7399e29094c66c88a6f4c0e996a906b
              String s = (String) Optional.ofNullable((String) optionset.valueOf("world")).orElse(dedicatedserversettings.getProperties().levelName);
              LevelStorageSource convertable = LevelStorageSource.createDefault(file.toPath());
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 84c1c6c433bad1c786bc7400d65d19cfcaa999e4..870db0028becd6b76af76190fae908d0031ed94d 100644
+index 3e1460b8331652c2f2e174ee41e3c728b2dbc753..2ed954f1fab3235a1d3fff2dd0d24c3b398b4d67 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -292,6 +292,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -295,6 +295,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      private static final int SAMPLE_INTERVAL = 100;
      public final double[] recentTps = new double[ 3 ];
      // Spigot end
@@ -4449,7 +4448,7 @@ index 84c1c6c433bad1c786bc7400d65d19cfcaa999e4..870db0028becd6b76af76190fae908d0
  
      public static <S extends MinecraftServer> S spin(Function<Thread, S> serverFactory) {
          AtomicReference<S> atomicreference = new AtomicReference();
-@@ -383,6 +384,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -385,6 +386,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
              }
          }
          Runtime.getRuntime().addShutdownHook(new org.bukkit.craftbukkit.util.ServerShutdownThread(this));
@@ -4523,23 +4522,23 @@ index 7c35fb22df0bca2c2ca885a872ee42d6073d852f..26fc8127024d7b81ffe5c1c81b8ef8a6
              }
              // CraftBukkit end
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 16a2efb7dcbcafca867fd75972a0bd80937b95a8..ae219be37c5fcec3dd3f8b08819551003e66d351 100644
+index 37b2696e69719e44490116e4c4f6ab86c38043ed..ad011c4f328129e2e5eb6b1b1f5e1d282d1ec04a 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -230,7 +230,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
-     public ServerLevel(MinecraftServer minecraftserver, Executor executor, LevelStorageSource.LevelStorageAccess convertable_conversionsession, PrimaryLevelData iworlddataserver, ResourceKey<Level> resourcekey, LevelStem worlddimension, ChunkProgressListener worldloadlistener, boolean flag, long i, List<CustomSpawner> list, boolean flag1, org.bukkit.World.Environment env, org.bukkit.generator.ChunkGenerator gen, org.bukkit.generator.BiomeProvider biomeProvider) {
          // Holder holder = worlddimension.type(); // CraftBukkit - decompile error
+ 
          // Objects.requireNonNull(minecraftserver); // CraftBukkit - decompile error
--        super(iworlddataserver, resourcekey, worlddimension.type(), minecraftserver::getProfiler, false, flag, i, minecraftserver.getMaxChainedNeighborUpdates(), gen, biomeProvider, env);
-+        super(iworlddataserver, resourcekey, worlddimension.type(), minecraftserver::getProfiler, false, flag, i, minecraftserver.getMaxChainedNeighborUpdates(), gen, biomeProvider, env, spigotConfig -> minecraftserver.paperConfigurations.createWorldConfig(io.papermc.paper.configuration.PaperConfigurations.createWorldContextMap(convertable_conversionsession.levelDirectory.path(), iworlddataserver.getLevelName(), resourcekey.location(), spigotConfig))); // Paper
+-        super(iworlddataserver, resourcekey, minecraftserver.registryAccess(), worlddimension.type(), minecraftserver::getProfiler, false, flag, i, minecraftserver.getMaxChainedNeighborUpdates(), gen, biomeProvider, env);
++        super(iworlddataserver, resourcekey, minecraftserver.registryAccess(), worlddimension.type(), minecraftserver::getProfiler, false, flag, i, minecraftserver.getMaxChainedNeighborUpdates(), gen, biomeProvider, env, spigotConfig -> minecraftserver.paperConfigurations.createWorldConfig(io.papermc.paper.configuration.PaperConfigurations.createWorldContextMap(convertable_conversionsession.levelDirectory.path(), iworlddataserver.getLevelName(), resourcekey.location(), spigotConfig))); // Paper
          this.pvpMode = minecraftserver.isPvpAllowed();
          this.convertable = convertable_conversionsession;
          this.uuid = WorldUUID.getUUID(convertable_conversionsession.levelDirectory.path().toFile());
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index bf6f50cfe5225804ae2cab4f50bcc7ee2ddfe36e..ca5cbd7c43d7e263f76d8719a259514c0748a430 100644
+index 9a86fedb7ea4932590b86ef96785141489b03528..40deaa2463876659c0579b5273b5249760e8f8c0 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
-@@ -152,6 +152,12 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -156,6 +156,12 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
      public final it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap<SpawnCategory> ticksPerSpawnCategory = new it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap<>();
      public boolean populating;
      public final org.spigotmc.SpigotWorldConfig spigotConfig; // Spigot
@@ -4552,22 +4551,22 @@ index bf6f50cfe5225804ae2cab4f50bcc7ee2ddfe36e..ca5cbd7c43d7e263f76d8719a259514c
  
      public final SpigotTimings.WorldTimingsHandler timings; // Spigot
      public static BlockPos lastPhysicsProblem; // Spigot
-@@ -169,8 +175,9 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -173,8 +179,9 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
  
      public abstract ResourceKey<LevelStem> getTypeKey();
  
--    protected Level(WritableLevelData worlddatamutable, ResourceKey<Level> resourcekey, Holder<DimensionType> holder, Supplier<ProfilerFiller> supplier, boolean flag, boolean flag1, long i, int j, org.bukkit.generator.ChunkGenerator gen, org.bukkit.generator.BiomeProvider biomeProvider, org.bukkit.World.Environment env) {
-+    protected Level(WritableLevelData worlddatamutable, ResourceKey<Level> resourcekey, Holder<DimensionType> holder, Supplier<ProfilerFiller> supplier, boolean flag, boolean flag1, long i, int j, org.bukkit.generator.ChunkGenerator gen, org.bukkit.generator.BiomeProvider biomeProvider, org.bukkit.World.Environment env, java.util.function.Function<org.spigotmc.SpigotWorldConfig, io.papermc.paper.configuration.WorldConfiguration> paperWorldConfigCreator) { // Paper
+-    protected Level(WritableLevelData worlddatamutable, ResourceKey<Level> resourcekey, RegistryAccess iregistrycustom, Holder<DimensionType> holder, Supplier<ProfilerFiller> supplier, boolean flag, boolean flag1, long i, int j, org.bukkit.generator.ChunkGenerator gen, org.bukkit.generator.BiomeProvider biomeProvider, org.bukkit.World.Environment env) {
++    protected Level(WritableLevelData worlddatamutable, ResourceKey<Level> resourcekey, RegistryAccess iregistrycustom, Holder<DimensionType> holder, Supplier<ProfilerFiller> supplier, boolean flag, boolean flag1, long i, int j, org.bukkit.generator.ChunkGenerator gen, org.bukkit.generator.BiomeProvider biomeProvider, org.bukkit.World.Environment env, java.util.function.Function<org.spigotmc.SpigotWorldConfig, io.papermc.paper.configuration.WorldConfiguration> paperWorldConfigCreator) { // Paper
          this.spigotConfig = new org.spigotmc.SpigotWorldConfig(((net.minecraft.world.level.storage.PrimaryLevelData) worlddatamutable).getLevelName()); // Spigot
 +        this.paperConfig = paperWorldConfigCreator.apply(this.spigotConfig); // Paper
          this.generator = gen;
          this.world = new CraftWorld((ServerLevel) this, gen, biomeProvider, env);
  
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 9afc0881f6891ef2696b6f2b37c0826f3beb0666..8873bf84c71c48297a360df9c99e511fa0af5b40 100644
+index ca2d2f44d722d2bf14f50670ac6192830b72c7f0..2cd8fc55056596731b34731a5fdf975f9a9f43ce 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -885,6 +885,7 @@ public final class CraftServer implements Server {
+@@ -880,6 +880,7 @@ public final class CraftServer implements Server {
          }
  
          org.spigotmc.SpigotConfig.init((File) console.options.valueOf("spigot-settings")); // Spigot
@@ -4576,10 +4575,10 @@ index 9afc0881f6891ef2696b6f2b37c0826f3beb0666..8873bf84c71c48297a360df9c99e511f
              world.serverLevelData.setDifficulty(config.difficulty);
              world.setSpawnSettings(config.spawnMonsters, config.spawnAnimals);
 diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
-index 2ae4dbd8cc49efb93ecceeb9a7a08e1a8af1d84a..fd213200dcc5fe08f4b28e94ce2a0cf5b3c7ad5b 100644
+index ad6d25b26454c3ec8c11f54e921df8914c3c62d9..7fc066ee281662192aad826840573e4181f5ceff 100644
 --- a/src/main/java/org/bukkit/craftbukkit/Main.java
 +++ b/src/main/java/org/bukkit/craftbukkit/Main.java
-@@ -131,6 +131,19 @@ public class Main {
+@@ -141,6 +141,19 @@ public class Main {
                          .defaultsTo(new File("spigot.yml"))
                          .describedAs("Yml file");
                  // Spigot End
@@ -4660,10 +4659,10 @@ index 0000000000000000000000000000000000000000..0396589795da1f83ddf62426236dde9a
 +    }
 +}
 diff --git a/src/test/java/org/bukkit/support/AbstractTestingBase.java b/src/test/java/org/bukkit/support/AbstractTestingBase.java
-index 8013cc99c063d2ca0c578c093e3112676f5361b7..1caa4ce02cd396160f0d9d5461de8290e7c078bb 100644
+index eab3834dca7cf70468390584156b9a770bfb2a32..a616624a7beb35239be0fc2bb7fe60db1c673c2d 100644
 --- a/src/test/java/org/bukkit/support/AbstractTestingBase.java
 +++ b/src/test/java/org/bukkit/support/AbstractTestingBase.java
-@@ -57,6 +57,7 @@ public abstract class AbstractTestingBase {
+@@ -62,6 +62,7 @@ public abstract class AbstractTestingBase {
          BIOMES = REGISTRY_CUSTOM.registryOrThrow(Registries.BIOME);
  
          DummyEnchantments.setup();

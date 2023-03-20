@@ -5,10 +5,10 @@ Subject: [PATCH] Paper Plugins
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 44af6bd382dca476e4afd458a743ae56c91a8dee..f5aa8d96dce1dbac78a99535786cf9c0085b3b80 100644
+index bb1f3b3d5a22ca391f4362e5d4cf016e7e9be0e3..f900b73c52971fe682171e7f99246afdb8b080f3 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
-@@ -44,7 +44,7 @@ dependencies {
+@@ -45,7 +45,7 @@ dependencies {
      implementation("org.ow2.asm:asm-commons:9.4")
      // Paper end
  
@@ -1401,10 +1401,10 @@ index 94f8ceb965cecb5669a84a0ec61c0f706c2a2673..e773db6da357ad210eb24d4c389af2dc
      }
  }
 diff --git a/src/main/java/org/bukkit/plugin/PluginDescriptionFile.java b/src/main/java/org/bukkit/plugin/PluginDescriptionFile.java
-index 0c9f4d1e9104fa6951114c1f9ec954dfcc749196..f1ae66989afaa433bf2896e0bfe2cea472f774d8 100644
+index 77a380537b338fdd0aa2f6777ff775056cc6b221..028805bcdb1d2bb0d11387db165b7376579e5f60 100644
 --- a/src/main/java/org/bukkit/plugin/PluginDescriptionFile.java
 +++ b/src/main/java/org/bukkit/plugin/PluginDescriptionFile.java
-@@ -194,7 +194,7 @@ import org.yaml.snakeyaml.nodes.Tag;
+@@ -195,7 +195,7 @@ import org.yaml.snakeyaml.nodes.Tag;
   *      inferno.burningdeaths: true
   *</pre></blockquote>
   */
@@ -1413,7 +1413,7 @@ index 0c9f4d1e9104fa6951114c1f9ec954dfcc749196..f1ae66989afaa433bf2896e0bfe2cea4
      private static final Pattern VALID_NAME = Pattern.compile("^[A-Za-z0-9 _.-]+$");
      private static final ThreadLocal<Yaml> YAML = new ThreadLocal<Yaml>() {
          @Override
-@@ -254,6 +254,70 @@ public final class PluginDescriptionFile {
+@@ -255,6 +255,70 @@ public final class PluginDescriptionFile {
      private Set<PluginAwareness> awareness = ImmutableSet.of();
      private String apiVersion = null;
      private List<String> libraries = ImmutableList.of();
@@ -2040,7 +2040,7 @@ index 6d634b0ea813ccb19f1562a7d0e5a59cea4eab21..e4b6f278a811acbb0070e311c5c3bdaf
          }
  
 diff --git a/src/main/java/org/bukkit/plugin/java/PluginClassLoader.java b/src/main/java/org/bukkit/plugin/java/PluginClassLoader.java
-index 2f74ec96ece706de23156ebabfe493211bc05391..2d2fa6ce5200eb5c75a733f9f54f400113cc22b0 100644
+index 2f74ec96ece706de23156ebabfe493211bc05391..302319acbc257a075adfb78d9f5c49fdadf45bdc 100644
 --- a/src/main/java/org/bukkit/plugin/java/PluginClassLoader.java
 +++ b/src/main/java/org/bukkit/plugin/java/PluginClassLoader.java
 @@ -29,7 +29,8 @@ import org.jetbrains.annotations.Nullable;
@@ -2067,7 +2067,7 @@ index 2f74ec96ece706de23156ebabfe493211bc05391..2d2fa6ce5200eb5c75a733f9f54f4001
  
 -    PluginClassLoader(@NotNull final JavaPluginLoader loader, @Nullable final ClassLoader parent, @NotNull final PluginDescriptionFile description, @NotNull final File dataFolder, @NotNull final File file, @Nullable ClassLoader libraryLoader) throws IOException, InvalidPluginException, MalformedURLException {
 +    @org.jetbrains.annotations.ApiStatus.Internal // Paper
-+    public PluginClassLoader(@Nullable final ClassLoader parent, @NotNull final PluginDescriptionFile description, @NotNull final File dataFolder, @NotNull final File file, @Nullable ClassLoader libraryLoader, @Nullable JarFile jarFile, io.papermc.paper.plugin.provider.entrypoint.DependencyContext dependencyContext) throws IOException, InvalidPluginException, MalformedURLException { // Paper // Paper - use JarFile provided by SpigotPluginProvider
++    public PluginClassLoader(@Nullable final ClassLoader parent, @NotNull final PluginDescriptionFile description, @NotNull final File dataFolder, @NotNull final File file, @Nullable ClassLoader libraryLoader, JarFile jarFile, io.papermc.paper.plugin.provider.entrypoint.DependencyContext dependencyContext) throws IOException, InvalidPluginException, MalformedURLException { // Paper // Paper - use JarFile provided by SpigotPluginProvider
          super(new URL[] {file.toURI().toURL()}, parent);
 -        Preconditions.checkArgument(loader != null, "Loader cannot be null");
 +        this.loader = null; // Paper - pass null into loader field
@@ -2077,7 +2077,7 @@ index 2f74ec96ece706de23156ebabfe493211bc05391..2d2fa6ce5200eb5c75a733f9f54f4001
          this.dataFolder = dataFolder;
          this.file = file;
 -        this.jar = new JarFile(file);
-+        this.jar = jarFile == null ? new JarFile(file) : jarFile; // Paper - use JarFile provided by SpigotPluginProvider
++        this.jar = jarFile; // Paper - use JarFile provided by SpigotPluginProvider
          this.manifest = jar.getManifest();
          this.url = file.toURI().toURL();
          this.libraryLoader = libraryLoader;
